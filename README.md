@@ -410,14 +410,5 @@ Specify your project license here (e.g., MIT, Apache-2.0). Add a `LICENSE` file 
 - Email: kasimsegun1@gmail.com
 - Issues: Use GitHub Issues on the repository
 
-## Assessment Matrix
-- ✅ Correctness/Requirements (30 points): All requested features and endpoints implemented and documented
-- ✅ Code Quality & Architecture (20 points): Clean layer separation, SOLID, clear patterns, ASCII diagram
-- ✅ Tests (20 points): Unit, slice, and integration tests with key scenarios covered
-- ✅ Error/Edge-Cases & Robustness (10 points): Validation, RFC 7807 errors, collision handling, idempotency
-- ✅ Observability & Documentation (10 points): Actuator endpoints, metrics, health checks, comprehensive README & API docs
-- ✅ Bonus Features (10 points): Expiry, Docker support, Prometheus metrics, rate limiting via aspect
-
-Total: 100 points.
 
 References: `pom.xml`, `src/main/java/com/urlshortener/{controller,api,service,repository,config,aspect,observability,ratelimit,util,validation}`, `src/main/resources/{application.yml,application-postgres.yml,static/index.html}`, `Dockerfile`, `docker-compose.yml`, `API_DOCUMENTATION.md`, tests under `src/test/java/com/urlshortener/`.
