@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener API</title>
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header h1 .emoji {
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section h2 {
+            color: var(--dark-color);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--light-color);
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.docs { border-left-color: var(--primary-color); }
+        .card.monitoring { border-left-color: var(--secondary-color); }
+        .card.dev { border-left-color: var(--warning-color); }
+
+        .card a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .card a:hover {
+            color: var(--primary-color);
+        }
+
+        .card .icon {
+            font-size: 1.5rem;
+        }
+
+        .card .description {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--light-color);
+            border-radius: 6px;
+        }
+
+        .feature .check {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+        }
+
+        .quick-start {
+            background: #f0f4f8;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .quick-start h3 {
+            margin-bottom: 15px;
+            color: var(--dark-color);
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin-bottom: 10px;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .key {
+            color: #9cdcfe;
+        }
+
+        footer {
+            background: var(--light-color);
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span class="emoji">🔗</span>
+                URL Shortener API
+            </h1>
+            <p>A production-ready microservice for shortening URLs with tracking, analytics, and rate limiting.</p>
+            <div class="badges">
+                <span class="badge">Spring Boot 3.x</span>
+                <span class="badge">Java 24</span>
+                <span class="badge">OpenAPI 3.0</span>
+                <span class="badge">REST API</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="section">
+                <h2>📚 Documentation</h2>
+                <div class="cards">
+                    <div class="card docs">
+                        <a href="/swagger-ui.html">
+                            <span class="icon">📖</span>
+                            <span>Swagger UI</span>
+                        </a>
+                        <p class="description">Interactive API documentation with try-it-out functionality</p>
+                    </div>
+                    <div class="card docs">
+                        <a href="/api-docs">
+                            <span class="icon">📄</span>
+                            <span>OpenAPI Spec (JSON)</span>
+                        </a>
+                        <p class="description">Raw OpenAPI 3.0 specification in JSON format</p>
+                    </div>
+                    <div class="card docs">
+                        <a href="/api-docs.yaml">
+                            <span class="icon">📝</span>
+                            <span>OpenAPI Spec (YAML)</span>
+                        </a>
+                        <p class="description">Raw OpenAPI 3.0 specification in YAML format</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>🔍 Monitoring</h2>
+                <div class="cards">
+                    <div class="card monitoring">
+                        <a href="/actuator">
+                            <span class="icon">⚙️</span>
+                            <span>Actuator Endpoints</span>
+                        </a>
+                        <p class="description">Spring Boot Actuator management endpoints</p>
+                    </div>
+                    <div class="card monitoring">
+                        <a href="/actuator/health">
+                            <span class="icon">💚</span>
+                            <span>Health Check</span>
+                        </a>
+                        <p class="description">Application health status and liveness probes</p>
+                    </div>
+                    <div class="card monitoring">
+                        <a href="/actuator/metrics">
+                            <span class="icon">📊</span>
+                            <span>Metrics</span>
+                        </a>
+                        <p class="description">Application metrics and performance data</p>
+                    </div>
+                    <div class="card monitoring">
+                        <a href="/actuator/prometheus">
+                            <span class="icon">📈</span>
+                            <span>Prometheus</span>
+                        </a>
+                        <p class="description">Prometheus-format metrics for monitoring</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>🛠️ Development</h2>
+                <div class="cards">
+                    <div class="card dev">
+                        <a href="/h2-console">
+                            <span class="icon">🗄️</span>
+                            <span>H2 Database Console</span>
+                        </a>
+                        <p class="description">In-memory database console (dev mode only)</p>
+                    </div>
+                    <div class="card dev">
+                        <a href="/actuator/info">
+                            <span class="icon">ℹ️</span>
+                            <span>Application Info</span>
+                        </a>
+                        <p class="description">Build and environment information</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>✨ Features</h2>
+                <div class="features">
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Collision-safe code generation</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Custom alias support</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Automatic URL expiration</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Access tracking & analytics</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Rate limiting (Bucket4j)</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>RFC 7807 error responses</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Prometheus metrics</span>
+                    </div>
+                    <div class="feature">
+                        <span class="check">✓</span>
+                        <span>Health checks & probes</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>🚀 Quick Start</h2>
+                <div class="quick-start">
+                    <h3>Create a short URL:</h3>
+                    <div class="code-block">
+                        <span class="comment"># Using curl</span><br>
+                        curl -X POST http://localhost:8080/api/shorten \<br>
+                        &nbsp;&nbsp;-H <span class="string">"Content-Type: application/json"</span> \<br>
+                        &nbsp;&nbsp;-d <span class="string">'{"url": "https://example.com/long/url"}'</span>
+                    </div>
+
+                    <h3>Response:</h3>
+                    <div class="code-block">
+                        {<br>
+                        &nbsp;&nbsp;<span class="key">"shortUrl"</span>: <span class="string">"http://localhost:8080/abc123d"</span>,<br>
+                        &nbsp;&nbsp;<span class="key">"shortCode"</span>: <span class="string">"abc123d"</span>,<br>
+                        &nbsp;&nbsp;<span class="key">"originalUrl"</span>: <span class="string">"https://example.com/long/url"</span>,<br>
+                        &nbsp;&nbsp;<span class="key">"createdAt"</span>: <span class="string">"2026-01-29T10:30:00Z"</span><br>
+                        }
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>
+                URL Shortener API v1.0.0 |
+                <a href="https://github.com/urlshortener/api">GitHub</a> |
+                Built with ❤️ using Spring Boot
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

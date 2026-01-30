@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: url-shortener-test
+
+  # H2 In-Memory Database for Testing
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+
+  # Jackson Configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+# Actuator configuration for tests (enable endpoints that integration tests expect)
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,loggers,env,beans,mappings
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# Logging Configuration for Tests
+logging:
+  level:
+    root: WARN
+    com.urlshortener: INFO
+    org.springframework.test: INFO
+    org.hibernate: WARN
+
+# Application Configuration for Tests
+urlshortener:
+  base-url: http://localhost:8080
+
+  code:
+    length: 7
+    max-retries: 5
+    strategy: random
+    charset: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    hash-algorithm: SHA-256
+    use-salt: true
+    timeout-ms: 1000
+    log-collisions: false
+
+  cleanup:
+    enabled: false  # Disable scheduled tasks in tests
+    cron: "-"
+    batch-size: 1000
+
+  rate-limit:
+    enabled: false  # Disable rate limiting in tests
+
+  url:
+    max-length: 2048
+    expiration-days: 365
+    allow-permanent: true

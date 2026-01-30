@@ -1,0 +1,240 @@
+spring:
+  application:
+    name: url-shortener
+
+  aop:
+    proxy-target-class: true
+
+  # H2 Database Configuration (default)
+  datasource:
+    url: jdbc:h2:mem:urlshortenerdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # Jackson Configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: false
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+      probes:
+        enabled: true
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: local
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 50ms,100ms,200ms,500ms,1s
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.urlshortener: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Springdoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+    display-operation-id: false
+    default-models-expand-depth: 1
+    default-model-expand-depth: 1
+    try-it-out-enabled: true
+    filter: true
+    show-extensions: true
+    show-common-extensions: true
+    doc-expansion: list
+    deep-linking: true
+    persist-authorization: true
+  show-actuator: true
+  paths-to-match: /api/**,/r/**
+  packages-to-scan: com.urlshortener
+
+# Application Info (exposed via /actuator/info)
+info:
+  app:
+    name: URL Shortener API
+    description: Production-ready REST API for URL shortening service
+    version: 1.0.0
+  team:
+    name: URL Shortener Team
+    email: support@urlshortener.com
+  features:
+    - Collision-safe code generation
+    - Automatic expiration and cleanup
+    - Rate limiting with Bucket4j
+    - Access tracking and analytics
+    - RFC 7807 error responses
+    - Prometheus metrics
+
+# Application-Specific Configuration
+urlshortener:
+  base-url: http://localhost:8080
+
+  # Legacy short-code configuration (deprecated - use 'code' instead)
+  short-code:
+    length: 7
+    charset: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  # Code Generator Configuration (new)
+  code:
+    # Length of generated short codes (4-12 characters)
+    # Longer codes = more combinations but less user-friendly
+    # 7 chars = 62^7 = ~3.5 trillion combinations
+    length: 7
+
+    # Maximum retry attempts when collision detected
+    max-retries: 5
+
+    # Character set for code generation (Base62)
+    # Must contain only URL-safe characters without duplicates
+    charset: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    # Generation strategy: random (recommended), hash, or counter
+    # - random: Cryptographically random codes (best for production)
+    # - hash: Deterministic hash-based codes
+    # - counter: Sequential codes (not recommended - predictable)
+    strategy: random
+
+    # Hash algorithm for hash-based generation (if strategy=hash)
+    # Options: MD5, SHA-1, SHA-256 (recommended), SHA-512
+    hash-algorithm: SHA-256
+
+    # Whether to use salt in hash-based generation
+    # Adds randomness to prevent predictable codes
+    use-salt: true
+
+    # Timeout for code generation in milliseconds
+    # Prevents infinite loops in case of issues
+    timeout-ms: 1000
+
+    # Whether to log collision events for monitoring
+    log-collisions: true
+
+  # Cleanup Job Configuration
+  cleanup:
+    # Whether to enable automatic cleanup of expired URLs
+    enabled: true
+
+    # Cron expression for scheduling cleanup job
+    # Format: "second minute hour day month weekday"
+    # Examples:
+    #   "0 0 0 * * *"     - Daily at midnight
+    #   "0 0 */6 * * *"   - Every 6 hours
+    #   "0 0 2 * * *"     - Daily at 2 AM
+    #   "0 0 0 * * SUN"   - Weekly on Sunday at midnight
+    cron: "0 0 0 * * *"
+
+    # Maximum number of URLs to delete in a single batch
+    # Prevents long-running transactions
+    batch-size: 1000
+
+  # Rate Limiting Configuration
+  rate-limit:
+    # Whether rate limiting is enabled globally
+    # When disabled, rate limiting annotations are ignored
+    enabled: true
+
+    # Default maximum number of tokens (requests) the bucket can hold
+    # This defines the burst capacity
+    capacity: 10
+
+    # Default number of tokens to refill during each refill period
+    refill-tokens: 10
+
+    # Default refill period in minutes
+    # Tokens are refilled at this interval
+    refill-period-minutes: 1
+
+  # URL Configuration
+  url:
+    # Maximum allowed length for long URLs (standard: 2048)
+    max-length: 2048
+
+    # Default expiration period in days (0 = no expiration)
+    # URLs without explicit expiration use this value
+    expiration-days: 365
+
+    # Whether to allow permanent URLs (no expiration)
+    allow-permanent: true
