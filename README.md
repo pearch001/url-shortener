@@ -396,15 +396,6 @@ url-shortener/
 └── README.md
 ```
 
-## Contributing (Optional)
-Contributions are welcome.
-- Fork the repo and create a feature branch
-- Run tests locally: `./mvnw test`
-- Open a pull request with a clear description and links to related issues
-
-## License (Optional)
-Specify your project license here (e.g., MIT, Apache-2.0). Add a `LICENSE` file at the repository root.
-
 ## Contact Information
 - Maintainer: Kasim Segun Ebenezer
 - Email: kasimsegun1@gmail.com
